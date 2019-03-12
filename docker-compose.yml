@@ -1,0 +1,26 @@
+version: '3'
+
+networks:
+  backend:
+    driver: ${NETWORKS_DRIVER}
+
+services:
+  php-env:
+    image: phpenv
+    container_name: phpenv
+    build:
+      context: ./phpenv
+      args:
+        - COMPOSER_REPO_PACKAGIST=${COMPOSER_REPO_PACKAGIST}
+    volumes:
+      - ./phpenv/nginx-conf.d:/etc/nginx/conf.d
+    ports:
+      - "${SSH_PORT}:22"
+      - "${HTTP_PORT}:80"
+      - "${MYSQL_PORT}:3306"
+      - "${REDIS_PORT}:6379"
+    tty: true
+    environment:
+      - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
+    networks:
+      - backend
