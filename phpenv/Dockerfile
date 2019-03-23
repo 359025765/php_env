@@ -4,7 +4,12 @@ RUN sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/mirrors.tuna.tsinghua.ed
 
 RUN apk update; \
     apk add --no-cache \
-        git openssh supervisor openrc nginx nodejs nodejs-npm mariadb mariadb-client redis
+        git openssh supervisor openrc tzdata \
+        nginx nodejs nodejs-npm \
+        glib libxrender \
+        ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
+
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 RUN apk add --no-cache \
         php7-bcmath \
@@ -30,6 +35,7 @@ RUN apk add --no-cache \
         php7-tokenizer \
         php7-xdebug \
         php7-xml \
+        php7-xmlreader \
         php7-xmlwriter \
         php7-zip; \
     rm -rf /tmp/* /var/cache/apk/*
@@ -38,11 +44,13 @@ RUN mkdir -p /etc/supervisor.d /run/nginx
 
 COPY conf/supervisord.ini /etc/supervisor.d/supervisord.ini
 
-ARG MYSQL_ROOT_PASS="root@pass"
-ENV MYSQL_ROOT_PASS ${MYSQL_ROOT_PASS}
+RUN sed -i 's/\r$//' /etc/supervisor.d/supervisord.ini
 
-RUN mysql_install_db --user=mysql --datadir=/var/lib/mysql
-#    mysqld_safe & mysqladmin -u root password "${DB_ROOT_PASS}"
+COPY wkhtmltopdf /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/wkhtmltopdf
+
+COPY fonts/* /usr/share/fonts/
 
 RUN wget -qO- https://getcomposer.org/installer | php; \
     mv composer.phar /usr/local/bin/composer;
@@ -63,6 +71,8 @@ RUN if [ ${NPM_REGISTRY} ]; then \
     npm config set registry ${NPM_REGISTRY} \
 ;fi
 
+RUN npm install apidoc -g
+
 RUN ssh-keygen -A
 
 RUN sed -i 's/#PasswordAuthentication\ yes/PasswordAuthentication\ no/' /etc/ssh/sshd_config; \
@@ -79,6 +89,6 @@ RUN mkdir /root/.ssh; \
     chmod 600 ~/.ssh/authorized_keys ~/.ssh/id_rsa.pub; \
     chmod 400 ~/.ssh/id_rsa;
 
-EXPOSE 22 80 3306 6379
+EXPOSE 22 80
 
 CMD ["supervisord"]
