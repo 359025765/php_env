@@ -2,7 +2,7 @@
 #### 利用Docker搭建的php开发环境
 
 默认操作系统os x，如果win10所有命令均在PowerShell终端完成
-
+*致敬我的大哥--华哥！*
 ---
 
 &emsp;&emsp;进入到*docker-compose.yml*根路径，执行`docker-compose up -d --build` 构建完容器后
