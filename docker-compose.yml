@@ -4,6 +4,11 @@ networks:
   backend:
     driver: ${NETWORKS_DRIVER}
 
+volumes:
+  php-syncs:
+      external:
+        name: 'php-syncs'
+
 services:
   phpenv:
     image: phpenv
@@ -14,6 +19,7 @@ services:
         - COMPOSER_REPO_PACKAGIST=${COMPOSER_REPO_PACKAGIST}
     volumes:
       - ./phpenv/nginx-conf.d:/etc/nginx/conf.d
+      - php-syncs:/var/www/
     ports:
       - "${SSH_PORT}:22"
       - "${HTTP_PORT}:80"

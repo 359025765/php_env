@@ -6,8 +6,7 @@ RUN apk update; \
     apk add --no-cache \
         git openssh supervisor openrc tzdata \
         nginx nodejs nodejs-npm \
-        glib libxrender \
-        ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
+        glib libxrender 
 
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -46,8 +45,6 @@ COPY conf/supervisord.ini /etc/supervisor.d/supervisord.ini
 
 RUN sed -i 's/\r$//' /etc/supervisor.d/supervisord.ini
 
-COPY wkhtmltopdf /usr/local/bin/
-
 RUN chmod +x /usr/local/bin/wkhtmltopdf
 
 COPY fonts/* /usr/share/fonts/
@@ -70,8 +67,6 @@ ENV NPM_REGISTRY ${NPM_REGISTRY}
 RUN if [ ${NPM_REGISTRY} ]; then \
     npm config set registry ${NPM_REGISTRY} \
 ;fi
-
-RUN npm install apidoc -g
 
 RUN ssh-keygen -A
 
